@@ -1,6 +1,11 @@
 #********************** FIRST STAGE ***************************
 FROM golang:1.14-alpine AS builder
 
+RUN apk add --no-cache ca-certificates git
+RUN go get -u github.com/go-sql-driver/mysql
+RUN go get -u github.com/gorilla/mux
+RUN go get -u github.com/joho/godotenv
+
 #Set the Current Working Directory
 WORKDIR /app
 
@@ -17,7 +22,8 @@ FROM alpine:3.10
 RUN apk --no-cache add ca-certificates
 #Copy
 COPY --from=builder /app/build/app .
+COPY --from=builder /app/.env .
 
 EXPOSE 80
 
-CMD ["./app"]
+CMD ["sh", "-c", "source .env && ./app"]
