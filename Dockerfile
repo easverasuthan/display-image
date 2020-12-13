@@ -1,20 +1,23 @@
-## Downloading Latest go image
-FROM golang:latest
+#********************** FIRST STAGE ***************************
+FROM golang:1.14-alpine AS builder
 
-## Creae a new directory within our image
-RUN mkdir /app
-
-## Copy the code from source to the container
-COPY . /app
-
-## Set the work directory as app
+#Set the Current Working Directory
 WORKDIR /app
 
-## Build the go application
-RUN go build -o main .
+# Copy everything from the current directory to the Working Directory
+COPY . .
 
-## Expose a port to connect with our application
+# Start the build and save it as `user`
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/app -v
+
+
+#********************** SECOND STAGE ***************************
+
+FROM alpine:3.10
+RUN apk --no-cache add ca-certificates
+#Copy
+COPY --from=builder /app/build/app .
+
 EXPOSE 80
 
-## Command to run when starting the container
-CMD ["/app/main"]
+CMD ["./app"]
