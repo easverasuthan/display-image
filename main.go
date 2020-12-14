@@ -33,7 +33,7 @@ func main() {
 		panic(err.Error())
 	}
 	router := mux.NewRouter()
-	router.HandleFunc("/images/{id}", getPost).Methods("GET")
+	router.HandleFunc("/image/{id}", getPost).Methods("GET")
 	http.ListenAndServe(":80", router)
 	defer db.Close()
 }
